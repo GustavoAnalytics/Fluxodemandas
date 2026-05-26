@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Governança de Sistemas & Dados | PMO Systems</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    :root {
+      --bg: #f4f4f5;
+      --surface: #ffffff;
+      --surface-soft: #f7f7f8;
+      --text: #111111;
+      --muted: #71717a;
+      --border: #e4e4e7;
+      --primary: #c73b3b;
+      --primary-2: #e14a4a;
+      --accent: #c73b3b;
+      --success: #22c55e;
+      --warning: #f59e0b;
+      --danger: #dc2626;
+      --shadow: 0 20px 60px rgba(0,0,0,.08);
+      --radius: 22px;
+    }
+    [data-theme="dark"] {
+      --bg: #0b0b0b;
+      --surface: #121212;
+      --surface-soft: #1a1a1a;
+      --text: #f5f5f5;
+      --muted: #a1a1aa;
+      --border: rgba(255,255,255,.08);
+      --primary: #c73b3b;
+      --primary-2: #e14a4a;
+      --accent: #c73b3b;
+      --shadow: 0 25px 70px rgba(0,0,0,.45);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(199,59,59,.18), transparent 28%),
+        radial-gradient(circle at top right, rgba(225,74,74,.10), transparent 22%),
+        linear-gradient(135deg, #050505 0%, #0b0b0b 35%, #111111 100%);
+      color: var(--text);
+      min-height: 100vh;
+    }
+    [data-theme="light"] body {
+      background:
+        radial-gradient(circle at top left, rgba(199,59,59,.12), transparent 28%),
+        radial-gradient(circle at top right, rgba(17,17,17,.06), transparent 24%),
+        linear-gradient(135deg, #ffffff 0%, #f4f4f5 48%, #ededee 100%);
+    }
+    .layout { display: grid; grid-template-columns: 290px 1fr; min-height: 100vh; }
+    aside {
+      position: sticky; top: 0; height: 100vh; padding: 24px 18px;
+      border-right: 1px solid rgba(255,255,255,.06);
+      background: rgba(10,10,10,.94);
+      backdrop-filter: blur(18px); overflow-y: auto;
+    }
+    [data-theme="light"] aside { background: rgba(255,255,255,.92); border-right: 1px solid var(--border); }
+    .brand {
+      padding: 16px; border: 1px solid var(--border); border-radius: 20px;
+      background: linear-gradient(135deg, rgba(199,59,59,.14), rgba(255,255,255,.035)); margin-bottom: 18px;
+    }
+    .brand-logo {
+      width: 168px; max-width: 100%; height: auto; display: block; margin-bottom: 14px;
+      background: #fff; padding: 10px 12px; border-radius: 16px; box-shadow: 0 12px 30px rgba(0,0,0,.16);
+    }
+    .brand-kicker { font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--accent); font-weight: 900; margin-bottom: 8px; }
+    .brand h2 { font-size: 18px; line-height: 1.15; }
+    nav { display: grid; gap: 7px; margin-top: 18px; }
+    nav a {
+      color: var(--muted); text-decoration: none; padding: 12px 14px; border-radius: 14px;
+      display: flex; align-items: center; gap: 10px; transition: .2s ease; font-weight: 700; font-size: 14px;
+    }
+    nav a:hover, nav a.active { background: rgba(199,59,59,.16); color: var(--text); transform: translateX(4px); }
+    [data-theme="dark"] nav a:hover, [data-theme="dark"] nav a.active { color: #ffffff; }
+    .theme-btn {
+      width: 100%; margin-top: 16px; padding: 12px 14px; border: 1px solid var(--border);
+      background: var(--surface-soft); color: var(--text); border-radius: 14px; cursor: pointer; font-weight: 800;
+    }
+    .theme-btn:hover { border-color: rgba(199,59,59,.45); box-shadow: 0 12px 30px rgba(199,59,59,.10); }
+    main { padding: 28px; overflow: hidden; }
+    .hero {
+      border: 1px solid rgba(255,255,255,.06);
+      background: linear-gradient(135deg, rgba(199,59,59,.10), rgba(255,255,255,.02));
+      border-radius: 32px; padding: 36px; box-shadow: 0 25px 80px rgba(0,0,0,.35);
+      position: relative; overflow: hidden; margin-bottom: 24px;
+    }
+    [data-theme="light"] .hero { border: 1px solid var(--border); background: linear-gradient(135deg, rgba(199,59,59,.08), rgba(255,255,255,.86)); box-shadow: var(--shadow); }
+    .hero::after {
+      content: ""; position: absolute; right: -80px; top: -80px; width: 260px; height: 260px; border-radius: 50%;
+      background: rgba(199,59,59,.22); filter: blur(2px);
+    }
+    .eyebrow { display: inline-flex; gap: 8px; font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: var(--accent); font-weight: 900; margin-bottom: 16px; }
+    h1 { font-size: clamp(34px, 5vw, 66px); line-height: .98; letter-spacing: -2.4px; max-width: 980px; margin-bottom: 18px; }
+    .hero p { color: var(--muted); font-size: 17px; line-height: 1.75; max-width: 980px; }
+    .hero-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 24px; }
+    .btn {
+      border: 0; border-radius: 999px; padding: 13px 18px; text-decoration: none; cursor: pointer; font-weight: 900;
+      color: #ffffff; background: linear-gradient(135deg, #c73b3b, #e14a4a); box-shadow: 0 14px 30px rgba(199,59,59,.28);
+    }
+    .btn.secondary { background: var(--surface-soft); color: var(--text); border: 1px solid var(--border); box-shadow: none; }
+    .section {
+      margin-top: 24px; border: 1px solid var(--border); background: rgba(255,255,255,.035);
+      border-radius: 28px; padding: 26px; box-shadow: var(--shadow);
+    }
+    [data-theme="light"] .section { background: rgba(255,255,255,.86); }
+    .section-header { display: flex; justify-content: space-between; gap: 18px; align-items: flex-start; margin-bottom: 20px; }
+    .section-title { font-size: 28px; letter-spacing: -.8px; margin-bottom: 8px; }
+    .section-desc { color: var(--muted); line-height: 1.65; max-width: 850px; }
+    .grid { display: grid; gap: 16px; }
+    .grid.kpis { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    .grid.systems { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .grid.two { grid-template-columns: 1.1fr .9fr; }
+    .kpi-card, .system-card, .process-card, .indicator-card {
+      border: 1px solid rgba(255,255,255,.05);
+      background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.015));
+      border-radius: var(--radius); padding: 20px; backdrop-filter: blur(10px);
+      transition: .25s ease; position: relative; overflow: hidden;
+    }
+    [data-theme="light"] .kpi-card, [data-theme="light"] .system-card, [data-theme="light"] .process-card, [data-theme="light"] .indicator-card { border: 1px solid var(--border); background: var(--surface); }
+    .kpi-card:hover, .system-card:hover, .process-card:hover, .indicator-card:hover { transform: translateY(-3px); border-color: rgba(199,59,59,.45); box-shadow: 0 12px 30px rgba(199,59,59,.12); }
+    .kpi-label { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: .09em; font-weight: 900; margin-bottom: 8px; }
+    .kpi-value { font-size: 34px; font-weight: 950; letter-spacing: -1px; color: var(--primary); }
+    .kpi-note { margin-top: 8px; color: var(--muted); font-size: 13px; line-height: 1.4; }
+    .system-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+    .system-icon {
+      width: 46px; height: 46px; border-radius: 16px; display: grid; place-items: center;
+      background: rgba(199,59,59,.13); color: var(--primary); font-weight: 950;
+    }
+    .pill { border: 1px solid var(--border); color: var(--muted); padding: 7px 10px; border-radius: 999px; font-size: 11px; font-weight: 800; }
+    .system-card h3 { font-size: 19px; margin-bottom: 8px; }
+    .system-card p { color: var(--muted); line-height: 1.55; font-size: 14px; }
+    .tags { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 14px; }
+    .tag { background: rgba(199,59,59,.12); color: var(--primary); padding: 7px 9px; border-radius: 999px; font-size: 11px; font-weight: 900; }
+    .journey { display: grid; gap: 14px; position: relative; }
+    .process-card { display: grid; grid-template-columns: 54px 1fr auto; align-items: center; gap: 14px; }
+    .step-number {
+      width: 54px; height: 54px; border-radius: 18px; display: grid; place-items: center;
+      background: linear-gradient(135deg, rgba(199,59,59,.28), rgba(225,74,74,.14)); color: var(--text); font-weight: 950;
+    }
+    .process-card h3 { font-size: 17px; margin-bottom: 5px; }
+    .process-card p { color: var(--muted); line-height: 1.55; font-size: 14px; }
+    .sla { font-size: 12px; font-weight: 900; color: #ffffff; background: linear-gradient(135deg, #c73b3b, #e14a4a); padding: 8px 10px; border-radius: 999px; white-space: nowrap; }
+    .tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
+    .tab-btn {
+      border: 1px solid var(--border); background: var(--surface-soft); color: var(--text); cursor: pointer;
+      padding: 11px 13px; border-radius: 999px; font-weight: 900; transition: .2s;
+    }
+    .tab-btn.active, .tab-btn:hover { background: var(--primary); color: #ffffff; }
+    .training-box { border: 1px solid var(--border); background: var(--surface); border-radius: var(--radius); padding: 20px; }
+    .training-title { font-size: 22px; margin-bottom: 8px; }
+    .training-desc { color: var(--muted); line-height: 1.6; margin-bottom: 16px; }
+    .timeline { display: grid; gap: 12px; }
+    .timeline-item { display: grid; grid-template-columns: 76px 1fr; gap: 12px; align-items: stretch; }
+    .day { border-radius: 16px; background: rgba(199,59,59,.13); display: grid; place-items: center; font-weight: 950; color: var(--primary); }
+    .timeline-content { border: 1px solid var(--border); border-radius: 16px; padding: 14px; background: var(--surface-soft); }
+    .timeline-content h4 { margin-bottom: 5px; }
+    .timeline-content p { color: var(--muted); line-height: 1.5; font-size: 14px; }
+    .charts { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .chart-card { border: 1px solid var(--border); background: var(--surface); border-radius: var(--radius); padding: 20px; min-height: 340px; }
+    .chart-card h3 { margin-bottom: 12px; }
+    .table-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); }
+    table { border-collapse: collapse; width: 100%; min-width: 760px; }
+    th, td { padding: 14px 15px; border-bottom: 1px solid var(--border); text-align: left; font-size: 14px; vertical-align: top; }
+    th { color: var(--muted); text-transform: uppercase; letter-spacing: .08em; font-size: 11px; background: var(--surface-soft); }
+    tr:last-child td { border-bottom: 0; }
+    .formula { color: var(--primary); font-weight: 900; font-size: 13px; }
+    .canvas-flow { border: 1px solid var(--border); background: var(--surface); border-radius: var(--radius); padding: 18px; overflow-x: auto; }
+    .bpmn { min-width: 920px; display: flex; align-items: center; gap: 10px; padding: 10px 0; }
+    .bpmn-node {
+      width: 150px; min-height: 86px; border: 1px solid var(--border); background: var(--surface-soft);
+      border-radius: 18px; display: grid; place-items: center; text-align: center; padding: 12px;
+      font-size: 13px; font-weight: 850; line-height: 1.35; position: relative;
+    }
+    .bpmn-node.start, .bpmn-node.end { border-radius: 999px; width: 118px; background: rgba(34,197,94,.12); color: var(--success); }
+    .bpmn-node.gateway { width: 94px; height: 94px; transform: rotate(45deg); border-radius: 16px; background: rgba(199,59,59,.13); }
+    .bpmn-node.gateway span { transform: rotate(-45deg); display: block; font-size: 12px; }
+    .arrow { color: var(--primary); font-weight: 950; font-size: 22px; white-space: nowrap; }
+    .footer { color: var(--muted); text-align: center; padding: 28px 0 10px 0; font-size: 13px; }
+    @media (max-width: 1100px) {
+      .layout { grid-template-columns: 1fr; }
+      aside { position: relative; height: auto; border-right: 0; border-bottom: 1px solid var(--border); }
+      nav { grid-template-columns: repeat(2, 1fr); }
+      .grid.kpis, .grid.systems, .grid.two, .charts { grid-template-columns: 1fr; }
+      .process-card { grid-template-columns: 54px 1fr; }
+      .sla { grid-column: 2; width: fit-content; }
+    }
+    @media (max-width: 620px) {
+      main { padding: 16px; }
+      .hero, .section { padding: 22px; border-radius: 24px; }
+      nav { grid-template-columns: 1fr; }
+      .timeline-item { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <aside>
+      <div class="brand">
+        <img src="image(14).png" alt="Área Incrível Incorporadora" class="brand-logo">
+        <div class="brand-kicker">Área Incrível Incorporadora</div>
+        <h2>Governança de Sistemas, Dados e Treinamentos</h2>
+      </div>
+      <nav>
+        <a class="active" href="#visao">🏠 Visão Geral</a>
+        <a href="#sistemas">🧩 Sistemas</a>
+        <a href="#processo">🔁 Processo Ideal</a>
+        <a href="#bpmn">🧭 Fluxo Desenhado</a>
+        <a href="#treinamento">🎓 Treinamento</a>
+        <a href="#indicadores">📊 Indicadores</a>
+        <a href="#dashboard">📈 Dashboard</a>
+        <a href="#governanca">🛡️ Governança</a>
+      </nav>
+      <button class="theme-btn" onclick="toggleTheme()">Alternar tema</button>
+    </aside>
+
+    <main>
+      <section id="visao" class="hero">
+        <div class="eyebrow">Gestão de Sistemas • Dados • Processos • Treinamento</div>
+        <h1>Mapeamento do fluxo de demandas para implantação e treinamento de sistemas.</h1>
+        <p>
+          Mapear o fluxo ideal da área: entrada da demanda, análise, contato com fornecedor,
+          estudo técnico, homologação, treinamento, certificação, Go Live, suporte assistido e indicadores de performance.
+        </p>
+        <div class="hero-actions">
+          <a class="btn" href="#processo">Ver processo completo</a>
+          <a class="btn secondary" href="#indicadores">Ver KPIs da área</a>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="grid kpis">
+          <div class="kpi-card"><div class="kpi-label">Sistemas gerenciados</div><div class="kpi-value">6</div><div class="kpi-note">Sienge, WMS Senior, Sankhya, Prevision, Mobuss e Omie.</div></div>
+          <div class="kpi-card"><div class="kpi-label">Fluxo padrão</div><div class="kpi-value">17</div><div class="kpi-note">Etapas do recebimento da demanda até melhoria contínua.</div></div>
+          <div class="kpi-card"><div class="kpi-label">Fases treinamento</div><div class="kpi-value">5</div><div class="kpi-note">Do acesso inicial à validação prática/certificação interna.</div></div>
+          <div class="kpi-card"><div class="kpi-label">KPIs sugeridos</div><div class="kpi-value">18</div><div class="kpi-note">Implantação, treinamento, suporte, qualidade e governança.</div></div>
+        </div>
+      </section>
+
+      <section id="sistemas" class="section">
+        <div class="section-header"><div><h2 class="section-title">Sistemas sob gestão</h2><p class="section-desc">Cada sistema deve ter processo, dono funcional, base de conhecimento, matriz de acesso, trilha de treinamento e indicadores próprios.</p></div></div>
+        <div class="grid systems" id="systemsGrid"></div>
+      </section>
+
+      <section id="processo" class="section">
+        <div class="section-header"><div><h2 class="section-title">Processo ideal da área</h2><p class="section-desc">Fluxo recomendado para padronizar como uma demanda chega, como é tratada e como vira entrega operacional.</p></div></div>
+        <div class="journey" id="journey"></div>
+      </section>
+
+      <section id="bpmn" class="section">
+        <div class="section-header"><div><h2 class="section-title">Fluxo visual — “entra demanda, sai sistema implantado”</h2><p class="section-desc">Visão simplificada estilo BPMN para apresentação executiva.</p></div></div>
+        <div class="canvas-flow">
+          <div class="bpmn">
+            <div class="bpmn-node start">Demanda recebida</div><div class="arrow">→</div>
+            <div class="bpmn-node">Validar necessidade</div><div class="arrow">→</div>
+            <div class="bpmn-node gateway"><span>Aprovado?</span></div><div class="arrow">→</div>
+            <div class="bpmn-node">Fornecedor + documentação</div><div class="arrow">→</div>
+            <div class="bpmn-node">Homologação e testes</div><div class="arrow">→</div>
+            <div class="bpmn-node">Treinamento + certificação</div><div class="arrow">→</div>
+            <div class="bpmn-node">Go Live assistido</div><div class="arrow">→</div>
+            <div class="bpmn-node end">Indicadores e melhoria</div>
+          </div>
+        </div>
+      </section>
+
+      <section id="treinamento" class="section">
+        <div class="section-header"><div><h2 class="section-title">Trilha de treinamento por sistema</h2><p class="section-desc">Selecione um sistema para visualizar uma trilha sugerida de capacitação.</p></div></div>
+        <div class="tabs" id="systemTabs"></div>
+        <div class="training-box"><h3 class="training-title" id="trainingTitle"></h3><p class="training-desc" id="trainingDesc"></p><div class="timeline" id="trainingTimeline"></div></div>
+      </section>
+
+      <section id="indicadores" class="section">
+        <div class="section-header"><div><h2 class="section-title">Indicadores da área</h2><p class="section-desc">Indicadores criados para medir a operação a partir de agora, por sistema, usuário, projeto e status.</p></div></div>
+        <div class="table-wrap">
+          <table><thead><tr><th>Indicador</th><th>Objetivo</th><th>Fórmula / Medição</th><th>Periodicidade</th><th>Responsável</th></tr></thead><tbody id="kpiTable"></tbody></table>
+        </div>
+      </section>
+
+      <section id="dashboard" class="section">
+        <div class="section-header"><div><h2 class="section-title">Dashboard executivo simulado</h2><p class="section-desc">Gráficos iniciais para apresentação do modelo de gestão.</p></div></div>
+        <div class="charts">
+          <div class="chart-card"><h3>Tempo médio de treinamento por sistema</h3><canvas id="trainingChart"></canvas></div>
+          <div class="chart-card"><h3>Status das demandas de sistemas</h3><canvas id="statusChart"></canvas></div>
+          <div class="chart-card"><h3>Chamados pós-implantação</h3><canvas id="supportChart"></canvas></div>
+          <div class="chart-card"><h3>Maturidade por sistema</h3><canvas id="maturityChart"></canvas></div>
+        </div>
+      </section>
+
+      <section id="governanca" class="section">
+        <div class="section-header"><div><h2 class="section-title">Modelo de governança</h2><p class="section-desc">Cada sistema precisa ter documentação, matriz de acesso, dono do processo, treinamento, histórico de chamados e indicadores de adoção.</p></div></div>
+        <div class="grid two">
+          <div class="indicator-card"><h3>Documentos obrigatórios por sistema</h3><div class="tags"><span class="tag">Manual rápido</span><span class="tag">Fluxograma AS-IS / TO-BE</span><span class="tag">Matriz de acesso</span><span class="tag">Procedimento operacional</span><span class="tag">FAQ</span><span class="tag">Trilha de treinamento</span><span class="tag">Checklist Go Live</span><span class="tag">Registro de usuários treinados</span></div></div>
+          <div class="indicator-card"><h3>Papéis e responsabilidades</h3><div class="tags"><span class="tag">Gestor de Sistemas</span><span class="tag">Analista de Dados</span><span class="tag">Fornecedor</span><span class="tag">Key User</span><span class="tag">Gestor da área</span><span class="tag">Usuário final</span><span class="tag">TI / Infra</span><span class="tag">PMO</span></div></div>
+        </div>
+      </section>
+
+      
+    </main>
+  </div>
+
+  <script>
+    const sistemas = [
+      {nome:"Sienge ERP", sigla:"SI", tipo:"ERP Construção", desc:"Gestão de obras, compras, financeiro, contratos, medições, engenharia e processos corporativos.", tags:["Compras","Financeiro","Obras","Contratos","Medições"]},
+      {nome:"WMS Senior ERP", sigla:"WM", tipo:"Logística/WMS", desc:"Gestão de armazém, recebimento, conferência, alocação, separação, inventário e expedição.", tags:["Recebimento","Separação","Inventário","Packing","Expedição"]},
+      {nome:"Sankhya ERP", sigla:"SK", tipo:"ERP Corporativo", desc:"Processos administrativos, comerciais, financeiros, compras, estoque, faturamento e gestão integrada.", tags:["Financeiro","Fiscal","Compras","Estoque","Faturamento"]},
+      {nome:"Prevision", sigla:"PR", tipo:"Planejamento", desc:"Planejamento e controle de obras, cronogramas, restrições, curva de avanço e gestão de produtividade.", tags:["Cronograma","PCP","Obras","Restrições","Produtividade"]},
+      {nome:"Mobuss", sigla:"MB", tipo:"Campo/Obras", desc:"Mobilidade para obras, apontamentos, qualidade, segurança, assistência técnica e registros operacionais.", tags:["Campo","Qualidade","Segurança","Assistência","Checklist"]},
+      {nome:"OMIE ERP", sigla:"OM", tipo:"ERP Financeiro", desc:"Gestão financeira, notas, contas a pagar/receber, emissão fiscal, conciliação e controle administrativo.", tags:["Notas","Financeiro","Conciliação","Recebíveis","Fiscal"]}
+    ];
+
+    const processoIdeal = [
+      ["Solicitação formal da demanda","A demanda deve chegar por gestor, coordenador, key user, PMO ou TI/Sistemas, com justificativa e necessidade clara.","D0"],
+      ["Validação da necessidade","Avaliar impacto, prioridade, risco, ganho operacional, custo e aderência ao negócio.","D+2"],
+      ["Contato com fornecedor","Solicitar documentação, manuais, APIs, fluxos, credenciais e ambiente de homologação.","D+3"],
+      ["Estudo técnico e funcional","Ler documentação, testar funcionalidades, levantar GAPs, riscos e dependências.","Até 1 semana"],
+      ["Acesso ao ambiente de testes","Criar acessos, perfis, dados de teste e base segura para simulação.","D+7"],
+      ["Mapeamento AS-IS / TO-BE","Desenhar processo atual e processo ideal, com responsáveis, entradas, saídas e aprovações.","D+10"],
+      ["Planejamento da implantação","Definir cronograma, responsáveis, treinamentos, riscos, Go Live e plano de suporte.","D+12"],
+      ["Base de conhecimento","Criar vídeos, PDFs, fluxogramas, FAQs, checklists, manuais rápidos e trilhas por perfil.","D+15"],
+      ["Treinamento faseado","Treinar usuários por função, sistema e processo, com foco prático e validação.","D+20"],
+      ["Certificação interna","Registrar presença, teste prático, aprovação do gestor e liberação oficial do usuário.","D+22"],
+      ["Go Live assistido","Acompanhar operação, corrigir falhas, apoiar usuários e registrar chamados.","D+25"],
+      ["Indicadores e melhoria contínua","Medir implantação, treinamento, chamados, erros, satisfação e maturidade do sistema.","Mensal"]
+    ];
+
+    const treinamentos = {
+      "Sienge ERP": {desc:"Trilha voltada para compras, financeiro, contratos, obras, aprovações e governança de processos.", dias:[["Dia 1","Visão geral","Navegação, módulos, perfis de acesso e principais rotinas do ERP."],["Dia 2","Processo da área","Fluxo de compras, pedidos, aprovações, contratos e financeiro."],["Dia 3","Rotina específica","Treinamento prático por função."],["Dia 4","Simulação prática","Cenários reais, erros comuns, correções, consultas e auditoria."],["Dia 5","Certificação","Checklist de validação, aprovação do gestor e registro."]]},
+      "WMS Senior ERP": {desc:"Trilha voltada para recebimento, conferência, alocação, separação, packing, inventário e expedição.", dias:[["Semana 1","Fundamentos WMS","Acesso, coletor, endereçamento, lotes, tarefas e regras operacionais."],["Semana 2","Operação prática","Recebimento, conferência de entrada, alocação, remanejamento e reabastecimento."],["Semana 3","Expedição e inventário","Separação, ondas, packing, conferência de saída, carga e inventário."],["Go Live","Operação assistida","Acompanhamento, correção de erros e reforço por perfil."],["Validação","Certificação operacional","Aprovação por perfil: operador, conferente, administrativo e líder."]]},
+      "Sankhya ERP": {desc:"Trilha voltada para processos administrativos, financeiros, fiscais, estoque, compras e faturamento.", dias:[["Dia 1","Visão geral","Acesso, telas principais, cadastros e conceitos."],["Dia 2","Rotina operacional","Compras, notas, faturamento, estoque ou financeiro."],["Dia 3","Prática guiada","Execução de cenários reais e erros comuns."],["Dia 4","Validação","Checklist de uso, dúvidas, evidências e liberação."],["Mensal","Reciclagem","Atualizações e indicadores de uso."]]},
+      "Prevision": {desc:"Trilha voltada para planejamento, controle de obras, cronograma, restrições e produtividade.", dias:[["Dia 1","Conceitos","Estrutura de planejamento, obras, etapas e cronograma."],["Dia 2","Cronograma","Cadastro, atualização e análise de desvios."],["Dia 3","Restrições","Registro de impedimentos, responsáveis e prazos."],["Dia 4","Indicadores","Curva de avanço, produtividade, PPC e análise gerencial."],["Dia 5","Validação","Simulação de rotina semanal."]]},
+      "Mobuss": {desc:"Trilha voltada para uso em campo, checklist, qualidade, segurança, assistência e registros.", dias:[["Dia 1","Acesso e app","Login, navegação, perfis e sincronização."],["Dia 2","Rotinas de campo","Checklists, apontamentos, fotos e evidências."],["Dia 3","Qualidade e segurança","Não conformidades, inspeções e planos de ação."],["Dia 4","Assistência técnica","Abertura, acompanhamento e encerramento."],["Dia 5","Validação","Teste prático e liberação."]]},
+      "OMIE ERP": {desc:"Trilha voltada para financeiro, fiscal, notas, contas a pagar, receber e conciliação.", dias:[["Dia 1","Visão geral","Acesso, cadastros, menus e permissões."],["Dia 2","Financeiro","Contas a pagar, receber, centros de custo e categorias."],["Dia 3","Fiscal e notas","Emissão, importação e conferência fiscal."],["Dia 4","Conciliação","Banco, baixa, fluxo de caixa e relatórios."],["Dia 5","Certificação","Checklist prático e aprovação do gestor."]]}
+    };
+
+    const indicadores = [
+      ["Tempo médio de implantação","Medir eficiência da entrega de novos sistemas.","Data Go Live - Data aprovação da demanda","Mensal","Gestor de Sistemas"],
+      ["% implantações no prazo","Controlar previsibilidade e cumprimento de cronograma.","Implantações no prazo / total de implantações","Mensal","PMO Sistemas"],
+      ["Tempo de homologação","Medir velocidade de validação funcional e técnica.","Data aprovação homologação - início dos testes","Por projeto","Analista de Sistemas"],
+      ["Tempo médio de treinamento","Medir quanto tempo um usuário leva para estar apto.","Data certificado - data início treinamento","Mensal","Gestor de Sistemas"],
+      ["% usuários treinados","Medir cobertura de capacitação por sistema.","Usuários treinados / usuários previstos","Semanal","Responsável treinamento"],
+      ["% usuários certificados","Garantir rastreabilidade e validação prática.","Usuários certificados / usuários treinados","Mensal","Gestor da área"],
+      ["Tempo de onboarding sistêmico","Medir tempo para liberar e capacitar novo colaborador.","Data apto - data admissão/solicitação","Mensal","Sistemas + RH"],
+      ["Chamados pós-Go Live","Medir estabilidade após implantação.","Qtd. chamados nos primeiros 30 dias","Por projeto","Suporte Sistemas"],
+      ["Tempo médio de resolução","Medir eficiência no atendimento.","Soma horas resolução / qtd. chamados","Semanal","Suporte Sistemas"],
+      ["Taxa de retrabalho","Identificar falha de processo ou treinamento.","Chamados recorrentes / total chamados","Mensal","Analista de Dados"],
+      ["Erros operacionais por sistema","Medir qualidade da operação após treinamento.","Qtd. erros classificados por sistema","Mensal","Key User + Sistemas"],
+      ["NPS/Satisfação do usuário","Medir percepção de qualidade do sistema e suporte.","Pesquisa 1 a 5 ou NPS","Mensal","Gestor de Sistemas"],
+      ["Maturidade documental","Medir governança da base de conhecimento.","Docs existentes / docs obrigatórios","Mensal","PMO Sistemas"],
+      ["Adoção do sistema","Medir se usuários realmente utilizam a solução.","Usuários ativos / usuários cadastrados","Mensal","Dados/BI"],
+      ["SLA de atendimento","Medir atendimento dentro do prazo acordado.","Chamados dentro SLA / total chamados","Semanal","Suporte Sistemas"]
+    ];
+
+    function renderSystems(){
+      document.getElementById("systemsGrid").innerHTML = sistemas.map(s => `
+        <article class="system-card"><div class="system-top"><div class="system-icon">${s.sigla}</div><span class="pill">${s.tipo}</span></div><h3>${s.nome}</h3><p>${s.desc}</p><div class="tags">${s.tags.map(t => `<span class="tag">${t}</span>`).join("")}</div></article>
+      `).join("");
+    }
+
+    function renderJourney(){
+      document.getElementById("journey").innerHTML = processoIdeal.map((p,i) => `
+        <article class="process-card"><div class="step-number">${String(i+1).padStart(2,"0")}</div><div><h3>${p[0]}</h3><p>${p[1]}</p></div><span class="sla">${p[2]}</span></article>
+      `).join("");
+    }
+
+    function renderTabs(){
+      const tabs = document.getElementById("systemTabs");
+      tabs.innerHTML = Object.keys(treinamentos).map((nome,index) => `<button class="tab-btn ${index===0?"active":""}" onclick="selectTraining('${nome}', this)">${nome}</button>`).join("");
+      selectTraining(Object.keys(treinamentos)[0], tabs.querySelector("button"));
+    }
+
+    function selectTraining(nome, btn){
+      document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+      if(btn) btn.classList.add("active");
+      const data = treinamentos[nome];
+      document.getElementById("trainingTitle").textContent = nome;
+      document.getElementById("trainingDesc").textContent = data.desc;
+      document.getElementById("trainingTimeline").innerHTML = data.dias.map(d => `
+        <div class="timeline-item"><div class="day">${d[0]}</div><div class="timeline-content"><h4>${d[1]}</h4><p>${d[2]}</p></div></div>
+      `).join("");
+    }
+
+    function renderKpis(){
+      document.getElementById("kpiTable").innerHTML = indicadores.map(i => `
+        <tr><td><strong>${i[0]}</strong></td><td>${i[1]}</td><td class="formula">${i[2]}</td><td>${i[3]}</td><td>${i[4]}</td></tr>
+      `).join("");
+    }
+
+    function createCharts(){
+      new Chart(document.getElementById("trainingChart"), {type:"bar", data:{labels:["Sienge","WMS Senior","Sankhya","Prevision","Mobuss","OMIE"], datasets:[{label:"Dias de treinamento", data:[5,15,4,5,5,4], backgroundColor:["#c73b3b","#e14a4a","#111111","#71717a","#a1a1aa","#f5f5f5"], borderRadius:10}]}, options:{responsive:true, plugins:{legend:{display:false}}}});
+      new Chart(document.getElementById("statusChart"), {type:"doughnut", data:{labels:["Backlog","Em análise","Homologação","Treinamento","Go Live"], datasets:[{data:[8,4,3,5,2], backgroundColor:["#71717a","#c73b3b","#e14a4a","#111111","#a1a1aa"], borderWidth:0}]}, options:{responsive:true, plugins:{legend:{position:"bottom"}}}});
+      new Chart(document.getElementById("supportChart"), {type:"line", data:{labels:["Semana 1","Semana 2","Semana 3","Semana 4"], datasets:[{label:"Chamados", data:[18,12,8,5], borderColor:"#c73b3b", backgroundColor:"rgba(199,59,59,.14)", fill:true, tension:.35}]}, options:{responsive:true}});
+      new Chart(document.getElementById("maturityChart"), {type:"radar", data:{labels:["Documentação","Treinamento","Adoção","Suporte","Indicadores"], datasets:[{label:"Maturidade média", data:[70,65,78,72,60], borderColor:"#c73b3b", backgroundColor:"rgba(199,59,59,.16)", pointBackgroundColor:"#e14a4a"}]}, options:{responsive:true}});
+    }
+
+    function toggleTheme(){
+      const html = document.documentElement;
+      html.setAttribute("data-theme", html.getAttribute("data-theme") === "dark" ? "light" : "dark");
+    }
+
+    document.querySelectorAll("nav a").forEach(link => {
+      link.addEventListener("click", () => {
+        document.querySelectorAll("nav a").forEach(a => a.classList.remove("active"));
+        link.classList.add("active");
+      });
+    });
+
+    renderSystems(); renderJourney(); renderTabs(); renderKpis(); createCharts();
+  </script>
+</body>
+</html>
