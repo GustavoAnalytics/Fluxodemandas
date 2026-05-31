@@ -180,11 +180,35 @@
     .bpmn-node.gateway span { transform: rotate(-45deg); display: block; font-size: 12px; }
     .arrow { color: var(--primary); font-weight: 950; font-size: 22px; white-space: nowrap; }
     .footer { color: var(--muted); text-align: center; padding: 28px 0 10px 0; font-size: 13px; }
+
+    .compare-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .scenario-card { border: 1px solid var(--border); border-radius: var(--radius); padding: 22px; background: var(--surface); position: relative; overflow: hidden; }
+    .scenario-card::before { content: ""; position: absolute; top: 0; left: 0; height: 5px; width: 100%; background: var(--primary); }
+    .scenario-card.bad::before { background: var(--danger); }
+    .scenario-card.good::before { background: var(--success); }
+    .scenario-card h3 { font-size: 23px; margin-bottom: 10px; }
+    .scenario-card p { color: var(--muted); line-height: 1.65; margin-bottom: 12px; }
+    .scenario-list { display: grid; gap: 10px; margin-top: 14px; }
+    .scenario-list li { list-style: none; border: 1px solid var(--border); background: var(--surface-soft); padding: 12px 14px; border-radius: 14px; color: var(--muted); line-height: 1.45; }
+    .scenario-list strong { color: var(--text); }
+    .risk-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin-top: 16px; }
+    .risk-card { border: 1px solid var(--border); background: var(--surface); border-radius: 18px; padding: 16px; }
+    .risk-card span { display: inline-flex; width: 34px; height: 34px; border-radius: 12px; align-items: center; justify-content: center; background: rgba(220,38,38,.12); color: var(--danger); font-weight: 950; margin-bottom: 10px; }
+    .risk-card h4 { margin-bottom: 6px; }
+    .risk-card p { color: var(--muted); line-height: 1.5; font-size: 14px; }
+    .comparison-table th:nth-child(2), .comparison-table td:nth-child(2) { background: rgba(220,38,38,.055); }
+    .comparison-table th:nth-child(3), .comparison-table td:nth-child(3) { background: rgba(34,197,94,.055); }
+    .mini-flow { display: grid; grid-template-columns: repeat(5, minmax(150px, 1fr)); gap: 10px; margin-top: 18px; overflow-x: auto; }
+    .mini-step { border: 1px solid var(--border); background: var(--surface-soft); border-radius: 18px; padding: 16px; min-height: 130px; }
+    .mini-step b { display: inline-grid; place-items: center; width: 32px; height: 32px; border-radius: 11px; background: rgba(199,59,59,.15); color: var(--primary); margin-bottom: 10px; }
+    .mini-step h4 { margin-bottom: 6px; }
+    .mini-step p { color: var(--muted); line-height: 1.45; font-size: 13px; }
+
     @media (max-width: 1100px) {
       .layout { grid-template-columns: 1fr; }
       aside { position: relative; height: auto; border-right: 0; border-bottom: 1px solid var(--border); }
       nav { grid-template-columns: repeat(2, 1fr); }
-      .grid.kpis, .grid.systems, .grid.two, .charts { grid-template-columns: 1fr; }
+      .grid.kpis, .grid.systems, .grid.two, .charts, .compare-grid, .risk-grid { grid-template-columns: 1fr; }
       .process-card { grid-template-columns: 54px 1fr; }
       .sla { grid-column: 2; width: fit-content; }
     }
@@ -206,6 +230,8 @@
       </div>
       <nav>
         <a class="active" href="#visao">🏠 Visão Geral</a>
+        <a href="#cenario-atual">⚠️ Cenário Atual</a>
+        <a href="#comparativo">🔄 AS-IS x TO-BE</a>
         <a href="#sistemas">🧩 Sistemas</a>
         <a href="#processo">🔁 Processo Ideal</a>
         <a href="#bpmn">🧭 Fluxo Desenhado</a>
@@ -237,6 +263,93 @@
           <div class="kpi-card"><div class="kpi-label">Fluxo padrão</div><div class="kpi-value">17</div><div class="kpi-note">Etapas do recebimento da demanda até melhoria contínua.</div></div>
           <div class="kpi-card"><div class="kpi-label">Fases treinamento</div><div class="kpi-value">5</div><div class="kpi-note">Do acesso inicial à validação prática/certificação interna.</div></div>
           <div class="kpi-card"><div class="kpi-label">KPIs sugeridos</div><div class="kpi-value">18</div><div class="kpi-note">Implantação, treinamento, suporte, qualidade e governança.</div></div>
+        </div>
+      </section>
+
+
+      <section id="cenario-atual" class="section">
+        <div class="section-header">
+          <div>
+            <h2 class="section-title">Cenário atual — como a demanda chega hoje</h2>
+            <p class="section-desc">
+              Hoje a área de Sistemas entra tarde no processo: o sistema já foi cotado, comprado ou até colocado em uso. Isso cria risco operacional, falta de governança, usuários sem perfil correto e baixa rastreabilidade.
+            </p>
+          </div>
+        </div>
+
+        <div class="compare-grid">
+          <article class="scenario-card bad">
+            <h3>AS-IS: cenário de hoje</h3>
+            <p>O processo atual é reativo. A demanda normalmente chega como uma solicitação urgente de acesso ou suporte, sem diagnóstico prévio do problema, sem participação em reuniões e sem desenho do processo.</p>
+            <ul class="scenario-list">
+              <li><strong>Entrada da demanda:</strong> aviso informal depois que o sistema já foi contratado ou iniciado.</li>
+              <li><strong>Participação de Sistemas:</strong> não participa da reunião com usuários, fornecedor e gestores.</li>
+              <li><strong>Usuários:</strong> criação de usuário solicitada depois que a pessoa já começou a trabalhar.</li>
+              <li><strong>Perfis de acesso:</strong> não existe definição clara do que cada usuário deve executar.</li>
+              <li><strong>Parametrização:</strong> sistema pode entrar em uso sem validação técnica, funcional e operacional.</li>
+            </ul>
+          </article>
+
+          <article class="scenario-card good">
+            <h3>TO-BE: cenário perfeito</h3>
+            <p>O cenário ideal é preventivo, estruturado e governado. A área de Sistemas participa desde a identificação da necessidade até o Go Live, garantindo usuários, perfis, parâmetros, treinamento e indicadores.</p>
+            <ul class="scenario-list">
+              <li><strong>Entrada da demanda:</strong> abertura formal com problema, objetivo, área solicitante e responsável.</li>
+              <li><strong>Participação de Sistemas:</strong> presença desde a primeira reunião com usuários, gestor e fornecedor.</li>
+              <li><strong>Usuários:</strong> criação planejada antes do início da operação.</li>
+              <li><strong>Perfis de acesso:</strong> matriz de perfil por função, área, rotina e nível de permissão.</li>
+              <li><strong>Parametrização:</strong> homologação antes do uso real, com testes, evidências e aprovação.</li>
+            </ul>
+          </article>
+        </div>
+
+        <div class="risk-grid">
+          <div class="risk-card"><span>01</span><h4>Risco de acesso indevido</h4><p>Sem matriz de perfil, usuários podem receber permissões acima ou abaixo da necessidade real.</p></div>
+          <div class="risk-card"><span>02</span><h4>Risco de processo errado</h4><p>Sem AS-IS e TO-BE, o sistema pode replicar falhas ou ser usado de forma desalinhada com a operação.</p></div>
+          <div class="risk-card"><span>03</span><h4>Risco de retrabalho</h4><p>Quando Sistemas entra tarde, ajustes de parametrização, suporte e treinamento viram urgência.</p></div>
+        </div>
+      </section>
+
+      <section id="comparativo" class="section">
+        <div class="section-header">
+          <div>
+            <h2 class="section-title">Comparativo AS-IS x TO-BE</h2>
+            <p class="section-desc">
+              Comparativo direto entre o cenário atual e o cenário perfeito para implantação, parametrização, criação de usuários e governança de sistemas.
+            </p>
+          </div>
+        </div>
+
+        <div class="table-wrap">
+          <table class="comparison-table">
+            <thead>
+              <tr>
+                <th>Etapa</th>
+                <th>Cenário atual — AS-IS</th>
+                <th>Cenário perfeito — TO-BE</th>
+                <th>Ganho esperado</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>Origem da demanda</strong></td><td>Informal, geralmente após contratação ou início do uso.</td><td>Formalizada antes da contratação, com problema, objetivo e área responsável.</td><td>Clareza, prioridade e rastreabilidade.</td></tr>
+              <tr><td><strong>Reunião inicial</strong></td><td>Sistemas não participa da reunião com usuários e fornecedor.</td><td>Sistemas participa desde o início com gestor, usuários-chave e fornecedor.</td><td>Menos GAPs e melhor entendimento operacional.</td></tr>
+              <tr><td><strong>Compra/contratação</strong></td><td>Sistema pode ser cotado e comprado sem análise técnica e funcional.</td><td>Antes da compra existe análise de aderência, riscos, integração, suporte e custo.</td><td>Decisão mais segura e estratégica.</td></tr>
+              <tr><td><strong>Parametrização</strong></td><td>Configuração feita sem validação completa do processo.</td><td>Parametrização validada em homologação antes do Go Live.</td><td>Redução de erros operacionais.</td></tr>
+              <tr><td><strong>Criação de usuários</strong></td><td>Solicitada quando o usuário já começou a operar.</td><td>Usuário criado antes do início, com perfil definido e aprovado.</td><td>Onboarding organizado e sem atraso.</td></tr>
+              <tr><td><strong>Perfil de acesso</strong></td><td>Sem clareza do que o usuário executará no sistema.</td><td>Matriz de acesso por cargo, área, rotina e nível de aprovação.</td><td>Segurança e governança.</td></tr>
+              <tr><td><strong>Treinamento</strong></td><td>Treinamento reativo, muitas vezes depois do erro acontecer.</td><td>Trilha de treinamento antes do uso, com checklist e validação prática.</td><td>Usuários mais preparados.</td></tr>
+              <tr><td><strong>Go Live</strong></td><td>Sistema entra em uso sem acompanhamento estruturado.</td><td>Go Live assistido, com suporte, registro de chamados e plano de estabilização.</td><td>Menos impacto na operação.</td></tr>
+              <tr><td><strong>Indicadores</strong></td><td>Não há medição clara de adoção, chamados, erros ou satisfação.</td><td>Dashboard com KPIs de implantação, treinamento, chamados, SLA e adoção.</td><td>Gestão baseada em dados.</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="mini-flow">
+          <div class="mini-step"><b>1</b><h4>Demanda formal</h4><p>Área solicita sistema ou melhoria explicando problema, impacto e objetivo.</p></div>
+          <div class="mini-step"><b>2</b><h4>Análise Sistemas</h4><p>Avalia processo, riscos, integrações, acessos, dados e fornecedor.</p></div>
+          <div class="mini-step"><b>3</b><h4>Homologação</h4><p>Testa parametrização, usuários, perfis, fluxos e regras de negócio.</p></div>
+          <div class="mini-step"><b>4</b><h4>Treinamento</h4><p>Capacita usuários por função, com evidência e checklist de liberação.</p></div>
+          <div class="mini-step"><b>5</b><h4>Go Live assistido</h4><p>Acompanha operação, mede indicadores e executa melhoria contínua.</p></div>
         </div>
       </section>
 
